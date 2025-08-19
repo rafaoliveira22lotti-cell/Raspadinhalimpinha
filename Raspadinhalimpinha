@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raspadinha GPT</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: 0 0 50px #00ff99 inset, 0 0 100px #00ff99 inset;
+  color: #00ff99;
+}
+.container {
+  padding: 40px;
+  text-align: center;
+  width: 460px;
+  background: rgba(0,0,0,0.85);
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 15px #00ff99, 0 0 30px #00ff99 inset;
+}
+h1 { margin: 0; font-size: 2em; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+h2 { margin: 5px 0 20px 0; font-size: 1em; font-weight: normal; opacity: 0.8; }
+#buttonContainer { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+button {
+  background-color: #00ff99;
+  border: none;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 0 3px #00ff99, 0 0 10px #00ff99 inset;
+}
+button:hover { background-color: #00cc77; box-shadow: 0 0 10px #00cc77, 0 0 20px #00cc77 inset; }
+#analyzeBtn { padding: 18px 40px; font-size: 1.3em; color: #000; }
+#openPlatformTop { padding: 12px 25px; font-size: 1em; color: #000; }
+#progress {
+  margin-top: 20px;
+  min-height: 200px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1em;
+  line-height: 1.4em;
+  position: relative;
+  overflow: hidden;
+  color: #00ff99;
+  text-align: center;
+  box-shadow: 0 0 30px #00ff99 inset;
+  border-radius: 15px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.highlight-text { font-size: 1.6em; font-weight: 800; color: #00ffcc; }
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #00ff99;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.8);opacity:1} }
+#analyzeAgainBtn { margin-top: 15px; padding: 10px 25px; font-size: 1em; border-radius: 10px; border: none; font-weight: bold; color: #000; background-color: #00ff99; cursor: pointer; box-shadow: 0 0 3px #00ff99, 0 0 10px #00ff99 inset; }
+#analyzeAgainBtn:hover { background-color: #00cc77; box-shadow: 0 0 10px #00cc77, 0 0 20px #00cc77 inset; }
+.analysis-title { font-size: 1.25em; display: block; margin-bottom: 5px; color: #00ffcc; }
+.win-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #FFD700;
+  color: #000;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: bold;
+  box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700 inset;
+  opacity: 0;
+  transition: opacity 0.5s, transform 0.5s;
+  z-index: 1000;
+}
+.win-message.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>RaspadinhaGPT</h1>
+  <h2>Análises com Inteligência Artificial</h2>
+  <div id="buttonContainer">
+    <button id="analyzeBtn">Analisar</button>
+    <button id="openPlatformTop">Abrir Plataforma</button>
+  </div>
+  <div id="progress"></div>
+</div>
+
+<!-- Sons com links públicos -->
+<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+<audio id="scannerSound" src="https://www.soundjay.com/misc/sounds/beep-07.mp3" loop></audio>
+
+<script>
+const analyzeBtn = document.getElementById('analyzeBtn');
+const openPlatformTopBtn = document.getElementById('openPlatformTop');
+const progress = document.getElementById('progress');
+const clickSound = document.getElementById('clickSound');
+const scannerSound = document.getElementById('scannerSound');
+
+function playClick(){ clickSound.currentTime=0; clickSound.play(); }
+
+analyzeBtn.addEventListener('click',()=>{
+  playClick();
+  startAnalysis();
+});
+
+openPlatformTopBtn.addEventListener('click',()=>{
+  playClick();
+  window.open('https://seusite.com','_blank');
+});
+
+const steps=[
+"Detectando padrões de cores e números...",
+"Analisando histórico de raspadinhas recentes...",
+"Calculando probabilidade de acerto...",
+"Simulando cenários possíveis...",
+"Identificando tendências ocultas...",
+"Avaliando combinações mais prováveis...",
+"Processando dados e inferências...",
+"Gerando recomendação final..."
+];
+
+const finalAnalysisResults=[
+"✅ Padrões Analisados com Sucesso",
+"🚨 Dificuldade em Identificar Alguns Padrões",
+"📊 Probabilidades Calculadas com Precisão",
+"⚡ Insights Prontos para Utilização",
+"🔒 Dados Processados com Segurança",
+"🧠 Análise Baseada em Algoritmos Avançados",
+"📈 Resultados Otimizados para Melhor Desempenho"
+];
+
+function getRandom(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+let typeInterval;
+function typeText(element,text,callback){
+  let i=0; element.innerHTML='';
+  if(typeInterval) clearInterval(typeInterval);
+  typeInterval=setInterval(()=>{
+    element.innerHTML+=text.charAt(i); i++;
+    if(i>=text.length){ clearInterval(typeInterval); typeInterval=null; if(callback)callback();}
+  },30);
+}
+
+function createParticles(){
+  const oldParticles=progress.querySelectorAll('.particle'); oldParticles.forEach(p=>p.remove());
+  const count=25;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div'); p.className='particle';
+    p.style.top=getRandom(0,progress.clientHeight)+'px';
+    p.style.left=getRandom(0,progress.clientWidth)+'px';
+    p.style.animationDuration=(1+Math.random()*1.5)+'s';
+    progress.appendChild(p);
+  }
+}
+
+function startAnalysis(){
+  analyzeBtn.disabled=true; analyzeBtn.innerText="Analisando"; progress.innerHTML='';
+  createParticles();
+  scannerSound.currentTime=0; scannerSound.play();
+
+  let elapsed=0; const totalDuration=getRandom(10,25);
+  function nextStep(){
+    const step=steps[getRandom(0,steps.length-1)];
+    typeText(progress,step,()=>{
+      const stepDuration=getRandom(2000,5000)/1000;
+      elapsed+=stepDuration;
+      if(elapsed>=totalDuration){ scannerSound.pause(); showResult(); }
+      else{ setTimeout(nextStep,stepDuration*1000);}
+    });
+  }
+  nextStep();
+}
+
+function showResult(){
+  const now=new Date(); now.setMinutes(now.getMinutes()+getRandom(2,5));
+  const scrapeTime=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  const accuracy=getRandom(70,95);
+  let resultHTML=`<div>
+      <strong class="analysis-title">Análise Pronta</strong><br>
+      <span class="highlight-text">Horário para raspar: ${scrapeTime}</span><br>
+      <span class="highlight-text">Chance de acerto: ${accuracy}%</span><br><br>
+    </div>`;
+  const shuffled=finalAnalysisResults.sort(()=>0.5-Math.random());
+  const selected=shuffled.slice(0,3);
+  resultHTML+=selected.map(r=>`<div>${r}</div>`).join("");
+  progress.innerHTML=resultHTML;
+  analyzeBtn.disabled=false; analyzeBtn.innerText="Analisar";
+}
+
+const names=["Felipe","Larissa","Gustavo","Ana","Carlos","Beatriz","Renan","Sofia","Lucas","Mariana",
+"João","Camila","Rafael","Juliana","Mateus","Isabela","Vinícius","Fernanda","Thiago","Patrícia",
+"Daniel","Carolina","Pedro","Bruna","Leandro","Aline","Ricardo","Vanessa","Bruno","Gabriela",
+"André","Natália","Marcelo","Tatiane","Rodrigo","Priscila","Eduardo","Marina","Fábio","Letícia",
+"Alexandre","Bianca","Diego","Carla","Júlio","Danielle","Fernando","Paula","Murilo","Amanda",
+"Vitor","Marcela","Samuel","Rebeca","Igor","Sabrina","Caio","Luana","Guilherme","Alice",
+"Henrique","Jéssica","Leonardo","Lívia","Mateo","Melissa","Thiago","Cecília","Bruno","Beatriz"];
+
+function showWinMessage(){
+  const name=names[getRandom(0,names.length-1)];
+  const div=document.createElement('div'); div.className='win-message';
+  if(Math.random()<0.08){ div.innerText=`${name} ganhou um iPhone 16 Pro Max! 🎉`; }
+  else{ const amount=(getRandom(100,1200)+Math.random()).toFixed(2); div.innerText=`${name} ganhou R$ ${amount}`; }
+  document.body.appendChild(div);
+  setTimeout(()=>{div.classList.add('show');},50);
+  setTimeout(()=>{div.classList.remove('show');},5000);
+  setTimeout(()=>{div.remove();},6000);
+}
+
+window.addEventListener('load',()=>{
+  setTimeout(showWinMessage,5000);
+  setInterval(showWinMessage,30000);
+});
+</script>
+</body>
+</html>
